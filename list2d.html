@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<title>2D စာရင်းကြည့်ရန်</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+  }
+  h2 {
+    text-align: center;
+  }
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .group {
+    background: #e0f2fe;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background: #38bdf8;
+    color: white;
+  }
+  .total {
+    background: #fef3c7;
+    font-weight: bold;
+  }
+  .delete-btn {
+    background: #f87171;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .clear-btn {
+    background: #ef4444;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body>
+
+<h2>📃 2D စာရင်း</h2>
+
+<input type="text" id="searchBox" placeholder="2D နံပါတ် ရိုက်ပါ (ဥပမာ 12)" maxlength="2">
+
+<button class="clear-btn" onclick="clearAll()">🗑 All Clear</button>
+
+<div id="listContainer"></div>
+
+<script>
+function renderList(filterNum="") {
+  let entries = JSON.parse(localStorage.getItem("twoD_entries") || "[]");
+
+  // filter by number
+  if (filterNum) {
+    entries = entries.filter(e => e.num === filterNum);
+  }
+
+  // group by date
+  const dates = [...new Set(entries.map(e => e.date))].sort();
+  let html = "";
+
+  dates.forEach(date => {
+    const dateGroup = entries.filter(e => e.date === date);
+    let dateTotal = dateGroup.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+    html += `<div class="group">📅 ${date} | Total: ${dateTotal.toLocaleString()}</div>`;
+
+    // group by time
+    const times = ["9:30", "12:00", "2:00", "4:00", "N/A"];
+    times.forEach(time => {
+      const timeGroup = dateGroup.filter(e => e.time === time);
+      if (timeGroup.length > 0) {
+        let timeTotal = timeGroup.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+        html += `<div style="margin-top:10px; font-weight:bold;">⏰ ${time} | Total: ${timeTotal.toLocaleString()}</div>`;
+        html += `<table>
+          <tr>
+            <th>Date</th>
+            <th>2D</th>
+            <th>Amount</th>
+            <th>Name</th>
+            <th>Time</th>
+            <th>Delete</th>
+          </tr>`;
+        timeGroup.forEach((e, index) => {
+          html += `<tr>
+            <td>${e.date}</td>
+            <td>${e.num}</td>
+            <td>${e.amount}</td>
+            <td>${e.name || ""}</td>
+            <td>${e.time || ""}</td>
+            <td><button class="delete-btn" onclick="deleteEntry('${e.date}','${e.num}','${e.amount}','${e.name}','${e.time}')">X</button></td>
+          </tr>`;
+        });
+        html += `</table>`;
+      }
+    });
+  });
+
+  document.getElementById("listContainer").innerHTML = html || "<p>စာရင်းမရှိသေးပါ</p>";
+}
+
+function deleteEntry(date, num, amount, name, time) {
+  let entries = JSON.parse(localStorage.getItem("twoD_entries") || "[]");
+  entries = entries.filter(e => !(e.date === date && e.num === num && e.amount == amount && e.name === name && e.time === time));
+  localStorage.setItem("twoD_entries", JSON.stringify(entries));
+  renderList(document.getElementById("searchBox").value.trim());
+}
+
+function clearAll() {
+  if (confirm("စာရင်းအားလုံး ဖျက်မလား?")) {
+    localStorage.removeItem("twoD_entries");
+    renderList();
+  }
+}
+
+document.getElementById("searchBox").addEventListener("input", function() {
+  const val = this.value.trim();
+  if (val.length === 2) {
+    renderList(val);
+  } else if (val.length === 0) {
+    renderList();
+  }
+});
+
+// initial load
+renderList();
+</script>
+
+</body>
+</html>

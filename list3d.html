@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D စာရင်း</title>
+  <style>
+    body {
+      font-family: 'Noto Sans Myanmar', 'Zawgyi-One', sans-serif;
+      background: silver;
+      margin: 0;
+      padding: 1rem;
+    }
+
+  
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, rgba(255, 99, 71, 0.5), #1e1e);
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    color: white;
+  }
+
+  .header-section h1 {
+    font-size: px;
+    color: dodgerblue;
+    margin: 0;
+    font-family: cursive;
+    font-weight: bold;
+  }
+
+  .clear-btn {
+    background-color: #FFEF00;
+    border: none;
+    padding: 3px 3px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .CL {
+    font-size: 30px;
+    margin: 0;
+    padding: 0px;
+  }
+  .L {
+    font-size: 1rem;
+    
+  }
+  .h {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+    vertical-align: middle;
+    pointer-events: none;
+  }
+
+  .clear-btn:hover {
+    background-color: #cc0000;
+  }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border: px solid yellow;
+      
+    }
+    
+    #listContainer {
+     border-left: 5px inset blue;
+     border-top-left-radius: 10px;
+     border-right: 5px inset blue;
+     border-top-right-radius: 10px;
+     border-bottom-left-radius: 10px;
+     border-bottom-right-radius: 10px;
+    }
+    
+    #searchInput {
+      border:3px ridge blue;
+      border-radius:6px;
+    }
+
+    input[type="text"], select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      flex-grow: 1;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .entry-group {
+      margin-bottom: 1.5rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .entry {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #ccc;
+      padding: 0.3rem 0;
+    }
+
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    .total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 1rem;
+    }
+
+    .footer-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .lang-switch {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .time {
+      font-size: 0.8rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-section">
+    <h1 class="h"><a href="https://fontmeme.com/3d-fonts/"><img src="https://fontmeme.com/permalink/250807/d1091094a37d2a85e97909ef44617063.png" alt="3d-fonts" border="0"></a><span class="L"><a href="https://fontmeme.com/burmese/"><img src="https://fontmeme.com/permalink/250807/939cc2a115b0185a936283aca09c267c.png" alt="burmese" border="0"></a></span></h1>
+    <button class="clear-btn" onclick="clearAll()"><div class="CL">🆑</div></button>
+</div>
+  </header>
+
+     <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 3D နံပါတ်ရှာရန်..." oninput="renderEntries()" />
+        <button onclick="printPage()">🖨️ Print</button>
+      </div>
+
+    <div id="listContainer"></div>
+
+    <div class="total" id="totalAmount">စုစုပေါင်း: 0 Ks</div>
+
+    <div class="lang-switch">
+    <label for="lang">🌐 Language: </label>
+    <select id="lang" onchange="setLanguage(this.value)">
+      <option value="mm">မြန်မာ</option>
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="th">ไทย</option>
+      <option value="jp">日本語</option>
+      </select>
+    
+  </div>
+
+  <script>
+    let entries = JSON.parse(localStorage.getItem("threeD_entries") || "[]");
+
+    const translations = {
+      mm: { title: "📋 3D စာရင်း", search: "🔍 3D နံပါတ်ရှာရန်...", total: "စုစုပေါင်း", clear: "🗑️ အားလုံးဖျက်မည်" },
+      en: { title: "📋 3D List", search: "🔍 Search 3D Number...", total: "Total", clear: "🗑️ Clear All" },
+      zh: { title: "📋 3D清单", search: "🔍 搜索3D号码...", total: "总计", clear: "🗑️ 全部清除" },
+      th: { title: "📋 รายการ 3D", search: "🔍 ค้นหาเลข 3D...", total: "รวม", clear: "🗑️ ล้างทั้งหมด" },
+      jp: { title: "📋 3Dリスト", search: "🔍 3D番号を検索...", total: "合計", clear: "🗑️ すべて削除" }
+    };
+
+    function setLanguage(lang) {
+      const t = translations[lang];
+      document.getElementById("title").innerText = t.title;
+      document.getElementById("searchInput").placeholder = t.search;
+      document.getElementById("totalAmount").innerText = `${t.total}: ${calculateTotal()} Ks`;
+    }
+
+    function groupByDate(entries) {
+      return entries.reduce((acc, entry) => {
+        const date = entry.date;
+        acc[date] = acc[date] || [];
+        acc[date].push(entry);
+        return acc;
+      }, {});
+    }
+
+    function calculateTotal() {
+      return entries.reduce((sum, e) => sum + (parseInt(e.amount) || 0), 0);
+    }
+
+    function renderEntries() {
+      const container = document.getElementById("listContainer");
+      const search = document.getElementById("searchInput").value.trim();
+      const grouped = groupByDate(entries);
+      container.innerHTML = "";
+
+      let total = 0;
+
+      Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+        const group = grouped[date].filter(e => e.number.includes(search));
+        if (group.length === 0) return;
+
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "entry-group";
+
+        const header = document.createElement("h3");
+        header.innerText = date;
+        groupDiv.appendChild(header);
+
+        group.forEach((entry, i) => {
+          const div = document.createElement("div");
+          div.className = "entry";
+          div.innerHTML = `
+            <span>${entry.number}</span>
+            <span>${entry.amount} Ks</span>
+            <span class="time">${entry.time}</span>
+            <button onclick="deleteEntry('${entry.id}')">❌</button>
+          `;
+          groupDiv.appendChild(div);
+          total += parseInt(entry.amount);
+        });
+
+        container.appendChild(groupDiv);
+      });
+
+      document.getElementById("totalAmount").innerText = `စုစုပေါင်း: ${total} Ks`;
+    }
+
+    function deleteEntry(id) {
+      entries = entries.filter(e => e.id !== id);
+      localStorage.setItem("threeD_entries", JSON.stringify(entries));
+      renderEntries();
+    }
+
+    function clearAll() {
+      if (confirm("အားလုံးဖျက်မည်မှာသေချာပါသလား?")) {
+        entries = [];
+        localStorage.removeItem("threeD_entries");
+        renderEntries();
+      }
+    }
+
+    function printPage() {
+      window.print();
+    }
+
+    // Auto-set time if not present
+    entries.forEach(e => {
+      if (!e.time) {
+        const now = new Date();
+        e.time = now.toLocaleTimeString();
+      }
+    });
+
+    localStorage.setItem("threeD_entries", JSON.stringify(entries));
+    renderEntries();
+  </script>
+</body>
+</html>

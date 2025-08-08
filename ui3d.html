@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>3D စာရင်းသွင်းခြင်း</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Noto Sans Myanmar', sans-serif;
+      background: linear-gradient(135deg, #74b9ff, #a29bfe);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #2d3436;
+    }
+
+    input {
+      width: 50%;    
+          /* ချုံ့ */
+      padding: 10px;           /* အတွင်းအကွာ */
+      margin: 8px 0;
+      border: 1px solid #dfe6e9;
+      border-radius: 8px;
+      font-size: 15px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0984e3;
+      box-shadow: 0 0 6px rgba(9,132,227,0.4);
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;  /* အပေါ်အောက် */
+      align-items: center;     /* အလယ်တည် */
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .button-group button,
+    .button-group .btn {
+      width: 30%;             /* Input နဲ့အကျယ်တူ */
+      padding: 12px 0;
+      background: #0984e3;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .button-group button:hover,
+    .button-group .btn:hover {
+      background: #74b9ff;
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+      min-height: 20px;
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        padding: 20px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>3D နံပါတ် + Amount ထည့်ပါ</h2>
+    
+    <input type="text" id="threeDigit" placeholder="3D နံပါတ် (ဥပမာ 123)" maxlength="3">
+    <input type="number" id="amount" placeholder="ငွေပမာဏ (ဥပမာ 1000)">
+    
+    <div class="button-group">
+      <button onclick="save3DEntry()">💾 တင်မည်</button>
+      <a href="list3d.html" class="btn">📃 စာရင်းကြည့်မည်</a>
+    </div>
+
+    <p id="msg"></p>
+  </div>
+
+  <script src="script3d.js"></script>
+</body>
+</html>

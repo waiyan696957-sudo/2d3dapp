@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>2D စာရင်းသွင်းခြင်း</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(to right, #dbeafe, #f0f9ff);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      margin-top: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    input, select, button, a.btn {
+      width: 50%;
+      max-width: 280px;
+      padding: 2px 4px;
+      margin: 5px auto;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      display: block;
+      cursor: pointer;
+    }
+    button, a.btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+    button:hover, a.btn:hover {
+      background: #2563eb;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .close {
+      float: right;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    #tempList {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+      text-align: left;
+    }
+    #tempList li {
+      background: #f1f1f1;
+      padding: 6px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+  .modal-content input,
+  .modal-content select,
+  .modal-content button {
+    width: 90%;
+    max-width: 260px;
+    padding: 7px;
+    font-size: 14px;}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>2D နံပါတ် + Amount ထည့်ပါ</h2>
+
+  <!-- မူလ input -->
+  <input type="text" id="twoDigit" placeholder="2D နံပါတ် (ဥပမာ 12)" maxlength="2">
+  <input type="number" id="amount" placeholder="ငွေပမာဏ (ဥပမာ 1000)">
+
+  <div class="button-group">
+    <button onclick="save2DEntry()" class="Btun">💾 တင်မည်</button>
+    <a href="list2d.html" class="btn">📃 စာရင်းကြည့်</a>
+  </div>
+
+  <hr>
+  <!-- အသစ်ထည့်မည် button -->
+  <button onclick="openModal()">➕ ထည့်မည်</button>
+
+  <p id="msg"></p>
+</div>
+
+<!-- Modal box -->
+<div id="entryModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3>📌 2D အချက်အလက်ထည့်မည်</h3>
+
+    <input type="text" id="modalTwoDigit" placeholder="2D နံပါတ်" maxlength="2">
+    <input type="number" id="modalAmount" placeholder="Amount">
+    <input type="text" id="modalName" placeholder="လူနာနာမည်">
+
+    <!-- အချိန်ရွေးချယ်ရန် -->
+    <select id="modalTime">
+      <option value="">အချိန်ရွေးပါ</option>
+      <option value="9:30">9:30</option>
+      <option value="12:00">12:00</option>
+      <option value="2:00">2:00</option>
+      <option value="4:00">4:00</option>
+    </select>
+
+    <button onclick="addTempEntry()">ထည့်မည်</button>
+
+    <ul id="tempList"></ul>
+
+    <button onclick="saveAllEntries()">💾 တင်မည်</button>
+  </div>
+</div>
+
+<script>
+let tempEntries = [];
+
+// Modal ဖွင့်
+function openModal() {
+  document.getElementById('entryModal').style.display = 'block';
+}
+
+// Modal ပိတ် + reset
+function closeModal() {
+  document.getElementById('entryModal').style.display = 'none';
+  tempEntries = [];
+  document.getElementById('tempList').innerHTML = "";
+}
+
+// Modal ထဲမှာ temporary list ထည့်
+function addTempEntry() {
+  const num = document.getElementById('modalTwoDigit').value.trim();
+  const amount = document.getElementById('modalAmount').value.trim();
+  const name = document.getElementById('modalName').value.trim();
+  const time = document.getElementById('modalTime').value;
+
+  if (!/^\d{2}$/.test(num) || !amount || !name || !time) {
+    alert("အချက်အလက်ပြည့်စုံထည့်ပါ");
+    return;
+  }
+
+  const entry = { num, amount, name, time };
+  tempEntries.push(entry);
+
+  const li = document.createElement("li");
+  li.textContent = `${time} - ${num} - ${amount} Ks - ${name}`;
+  document.getElementById('tempList').appendChild(li);
+
+  // clear inputs
+  document.getElementById('modalTwoDigit').value = "";
+  document.getElementById('modalAmount').value = "";
+  document.getElementById('modalName').value = "";
+  document.getElementById('modalTime').value = "";
+}
+
+// LocalStorage ထဲသိမ်း
+function saveAllEntries() {
+  const date = new Date().toLocaleDateString();
+  let entries = JSON.parse(localStorage.getItem("twoD_entries") || "[]");
+
+  tempEntries.forEach(e => {
+    entries.push({ ...e, date });
+  });
+
+  localStorage.setItem("twoD_entries", JSON.stringify(entries));
+  closeModal();
+  alert("အားလုံး သိမ်းပြီးပါပြီ");
+}
+
+// မူလ single entry save function
+function save2DEntry() {
+  const num = document.getElementById('twoDigit').value.trim();
+  const amount = document.getElementById('amount').value.trim();
+  const date = new Date().toLocaleString();
+
+  if (!/^\d{2}$/.test(num) || !amount) {
+    alert("အချက်အလက်ပြည့်စုံထည့်ပါ");
+    return;
+  }
+
+  let entries = JSON.parse(localStorage.getItem("twoD_entries") || "[]");
+  entries.push({ num, amount, date, name: "N/A", time: "N/A" });
+  localStorage.setItem("twoD_entries", JSON.stringify(entries));
+
+  document.getElementById('twoDigit').value = "";
+  document.getElementById('amount').value = "";
+  document.getElementById('msg').textContent = "✅ သိမ်းပြီးပါပြီ";
+}
+</script>
+
+</body>
+</html>
